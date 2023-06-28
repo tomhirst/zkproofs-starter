@@ -6,15 +6,17 @@ describe('Has answer', function () {
     let circuit: any;
 
     const correctInput = {
-        x: '3'
+        x: '1',
+        y: '2'
     };
 
     const incorrectInput = {
-        x: '4'
+        x: '4',
+        y: '2'
     };
 
     const correctOutput = {
-        y: '3'
+        z: '3'
     };
 
     const sanityCheck = true; 
@@ -31,7 +33,7 @@ describe('Has answer', function () {
 
         it('Has expected witness values', async () => {
             const witness = await circuit.calculateLabeledWitness(correctInput, sanityCheck);
-            assert.propertyVal(witness, 'main.x', correctInput.x);
+            assert.propertyVal(witness, 'main.z', correctOutput.z);
         });
 
         it('Gives the correct output', async () => {
@@ -44,7 +46,7 @@ describe('Has answer', function () {
         });
     });
 
-    describe('Verifier tests', () => {
+    describe('Verifier contract tests', () => {
         let verifier: any;
         let calldata: string[];
 
@@ -63,7 +65,7 @@ describe('Has answer', function () {
         });
 
         it('Rejects invalid proofs', async () => {
-            expect(await verifier.verifyProof(calldata[0], ['0x0000000000000000000000000000000000000000000000000000000000000004', '0x0000000000000000000000000000000000000000000000000000000000000004'])).to.be.false;
+            expect(await verifier.verifyProof(calldata[0], ['0x0000000000000000000000000000000000000000000000000000000000000000', '0x0000000000000000000000000000000000000000000000000000000000000000'])).to.be.false;
         });
     });
 });
