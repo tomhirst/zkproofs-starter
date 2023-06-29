@@ -1,6 +1,6 @@
 import { FunctionComponent, ReactNode } from 'react';
 import classNames from 'classnames';
-import Link from './Link';
+
 import { UrlObject } from 'url';
 declare type Url = string | UrlObject;
 
@@ -34,16 +34,6 @@ const Button: FunctionComponent<ButtonProps> = ({
   } uppercase font-bold hover:opacity-90 flex space-x-2 items-center justify-center whitespace-nowrap disabled:opacity-80`;
   const colorClasses = muted ? 'bg-gray-100 text-gray-900' : 'bg-primary text-white z-10 relative';
   const classes = classNames(defaultClasses, colorClasses, className);
-
-  if (href) {
-    return (
-      <div className="relative">
-        <Link className={classes} href={href} newWindow={newWindow}>
-          {children}
-        </Link>
-      </div>
-    );
-  }
 
   if (type === 'submit') {
     return (

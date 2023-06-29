@@ -3,7 +3,7 @@ import Wrapper from '@/components/Wrapper';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const Header = () => (
-  <header className="bg-white dark:bg-black h-20 border-b">
+  <header className="bg-black text-white h-20 border-b">
     <Wrapper withJustifyBetween withItemsCenter>
       <Logo />
       <ConnectButton />
