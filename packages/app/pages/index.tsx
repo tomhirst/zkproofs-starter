@@ -17,8 +17,8 @@ const Home = () => {
   const [calldataError, setCalldataError] = useState('');
   const [readText, setReadText] = useState('');
   const [hash, setHash] = useState('');
-  const address = process.env.NEXT_PUBLIC_HARDHAT_PROVEN_SOLVERS_ADDRESS!;
-
+  const address = process.env.NEXT_PUBLIC_CHAIN_ID === '5' ? process.env.NEXT_PUBLIC_GOERLI_PROVEN_SOLVERS_ADDRESS! : process.env.NEXT_PUBLIC_HARDHAT_PROVEN_SOLVERS_ADDRESS!;
+  
   useEffect(() => {
     setCalldata(['', []]);
     setCalldataError('');
@@ -131,7 +131,6 @@ const Home = () => {
       args: [wallet],
       enabled: !!wallet,
     },
-    [wallet],
   );
 
   useEffect(() => {

@@ -13,6 +13,8 @@
     "circom": "hardhat circom --deterministic --debug --verbose",
     "hardhat": "hardhat node",
     "compile": "hardhat compile",
-    "deploy": "hardhat run scripts/deploy.ts"
+    "deploy": "hardhat run --network localhost scripts/deploy.ts",
+    "deploy:goerli": "hardhat run --network goerli scripts/deploy.ts",
+    "verify:goerli": "hardhat verify --network goerli"
   }
 }
