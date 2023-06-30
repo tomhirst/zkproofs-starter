@@ -6,8 +6,6 @@ import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { publicProvider } from 'wagmi/providers/public';
 import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 
-console.log(process.env.ALCHEMY_API_KEY, process.env.WALLET_CONNECT_PROJECT_ID);
-
 const { chains, publicClient } = configureChains(
   [hardhat, mainnet, goerli],
   [alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY! }), publicProvider()],

@@ -1,10 +1,112 @@
 import PageWrapper from '@/components/PageWrapper';
 import Button from '@/components/Button';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { usePrepareContractWrite, useContractWrite, useContractRead, useAccount } from 'wagmi';
 
 const Home = () => {
   const [input1, setInput1] = useState(0);
   const [input2, setInput2] = useState(0);
+  const [calldataLoading, setCalldataLoading] = useState(false);
+  const [calldata, setCalldata] = useState(['', []]);
+  const [calldataError, setCalldataError] = useState('');
+  const address = process.env.NEXT_PUBLIC_HARDHAT_PROVEN_SOLVERS_ADDRESS!;
+
+  useEffect(() => {
+    setCalldata(['', []]);
+  }, [input1, input2]);
+
+  const getProof = async () => {
+    if (!input1 && !input2) return;
+
+    setCalldataError('');
+    setCalldata(['', []]);
+    setCalldataLoading(true);
+
+    const input = {
+      x: input1,
+      y: input2,
+    };
+
+    const data = await fetch('/api/prove', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+
+    const json = await data.json();
+
+    if (json.error) {
+      setCalldataError(json.error);
+      setCalldata(['', []]);
+    } else {
+      if (json.calldata) {
+        setCalldata(json.calldata);
+      }
+    }
+
+    setCalldataLoading(false);
+  };
+
+  const abi = [
+    {
+      inputs: [
+        {
+          internalType: 'bytes',
+          name: 'proof',
+          type: 'bytes',
+        },
+        {
+          internalType: 'uint256[]',
+          name: 'pubSignals',
+          type: 'uint256[]',
+        },
+      ],
+      name: 'prove',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+    {
+      inputs: [
+        {
+          internalType: 'address',
+          name: '',
+          type: 'address',
+        },
+      ],
+      name: 'provenSolvers',
+      outputs: [
+        {
+          internalType: 'bool',
+          name: '',
+          type: 'bool',
+        },
+      ],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const { config, error } = usePrepareContractWrite({
+    address,
+    abi,
+    functionName: 'prove',
+    args: [calldata[0], calldata[1]],
+    enabled: calldata[0] && calldata[1].length > 0,
+  });
+  const { write, error: writeError, isLoading: writeLoading } = useContractWrite(config);
+  const { address: wallet } = useAccount();
+
+  const {
+    data,
+    error: readError,
+    isLoading: readLoading,
+  } = useContractRead({
+    address,
+    abi,
+    functionName: 'provenSolvers',
+    args: [wallet],
+  });
+
   return (
     <PageWrapper>
       <div className="divide-y space-y-16">
@@ -31,12 +133,28 @@ const Home = () => {
             <div>=</div>
             <div className="font-bold">3</div>
           </div>
-          <div className="w-[180px]">
-            <Button large>Prove solution</Button>
+          <div className="flex space-x-4">
+            <div className="w-[180px]">
+              <Button
+                large
+                onClick={getProof}
+                disabled={(!input1 && !input2) || !!calldata[1].length}
+              >
+                {calldataLoading ? 'Loading...' : 'Check solution'}
+              </Button>
+            </div>
+            <div className="w-[180px]">
+              <Button large onClick={write} disabled={!calldata[0] && !calldata[1].length}>
+                {writeLoading ? 'Loading...' : 'Prove on-chain'}
+              </Button>
+            </div>
           </div>
+          <div>{calldataError && <div className="text-red-500">{calldataError}</div>}</div>
         </div>
         <div>
-          <h3 className="text-4xl font-bold my-8">Proven solvers</h3>
+          <h3 className="text-4xl font-bold my-8">Are you a proven solver?</h3>
+
+          {!readLoading && data && data[0] ? 'Yes' : 'No'}
         </div>
       </div>
     </PageWrapper>

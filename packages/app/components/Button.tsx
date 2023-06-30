@@ -31,7 +31,7 @@ const Button: FunctionComponent<ButtonProps> = ({
 }) => {
   const defaultClasses = `rounded w-full ${
     large ? `py-3 px-4 text-sm sm:text-base` : `py-2 px-4 text-xs sm:text-sm`
-  } uppercase font-bold hover:opacity-90 flex space-x-2 items-center justify-center whitespace-nowrap disabled:opacity-80`;
+  } uppercase font-bold hover:opacity-90 flex space-x-2 items-center justify-center whitespace-nowrap disabled:opacity-50`;
   const colorClasses = muted ? 'bg-gray-100 text-gray-900' : 'bg-primary text-white z-10 relative';
   const classes = classNames(defaultClasses, colorClasses, className);
 
