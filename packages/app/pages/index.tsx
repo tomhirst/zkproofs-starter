@@ -154,6 +154,7 @@ const Home = () => {
                 type="number"
                 value={input1}
                 onChange={e => setInput1(parseInt(e.target.value))}
+                disabled={!wallet}
               />
             </div>
             <div>+</div>
@@ -163,6 +164,7 @@ const Home = () => {
                 type="number"
                 value={input2}
                 onChange={e => setInput2(parseInt(e.target.value))}
+                disabled={!wallet}
               />
             </div>
             <div>=</div>
@@ -173,7 +175,7 @@ const Home = () => {
               <Button
                 large
                 onClick={getProof}
-                disabled={(!input1 && !input2) || !!calldata[1].length}
+                disabled={!wallet || (!input1 && !input2) || !!calldata[1].length}
               >
                 {calldataLoading ? 'Loading...' : 'Check solution'}
               </Button>
@@ -182,7 +184,9 @@ const Home = () => {
               <Button
                 large
                 onClick={write}
-                disabled={(!calldata[0] && !calldata[1].length) || writeLoading || txLoading}
+                disabled={
+                  !wallet || (!calldata[0] && !calldata[1].length) || writeLoading || txLoading
+                }
               >
                 {writeLoading || txLoading ? 'Loading...' : 'Prove on-chain'}
               </Button>
@@ -204,7 +208,12 @@ const Home = () => {
                   </a>
                 </div>
               )}
-              {!input1 && !input2 && <div className="text-gray-500">Please enter a value</div>}
+
+              {!wallet ? (
+                <div className="text-gray-500">Please connect wallet</div>
+              ) : (
+                !input1 && !input2 && <div className="text-gray-500">Please enter a value</div>
+              )}
             </>
           </div>
         </div>
