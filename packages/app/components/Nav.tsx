@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { navItems, NavItem } from '@/lib/data';
 
 const Nav = () => {
   const [isExpanded, setIsExpanded] = useState(false);
