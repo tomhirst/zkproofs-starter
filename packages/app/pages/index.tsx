@@ -132,6 +132,7 @@ const Home = () => {
     functionName: 'provenSolvers',
     args: [wallet],
     enabled: !!wallet,
+    watch: true,
   });
 
   useEffect(() => {
