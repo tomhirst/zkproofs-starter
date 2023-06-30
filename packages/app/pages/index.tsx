@@ -204,6 +204,9 @@ const Home = () => {
                   </a>
                 </div>
               )}
+              {!input1 && !input2 && (
+                <div className="text-gray-500">Please enter a value</div>
+              )}
             </>
           </div>
         </div>
