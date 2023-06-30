@@ -17,8 +17,11 @@ const Home = () => {
   const [calldataError, setCalldataError] = useState('');
   const [readText, setReadText] = useState('');
   const [hash, setHash] = useState('');
-  const address = process.env.NEXT_PUBLIC_CHAIN_ID === '5' ? process.env.NEXT_PUBLIC_GOERLI_PROVEN_SOLVERS_ADDRESS! : process.env.NEXT_PUBLIC_HARDHAT_PROVEN_SOLVERS_ADDRESS!;
-  
+  const address =
+    process.env.NEXT_PUBLIC_CHAIN_ID === '5'
+      ? process.env.NEXT_PUBLIC_GOERLI_PROVEN_SOLVERS_ADDRESS!
+      : (process.env.NEXT_PUBLIC_HARDHAT_PROVEN_SOLVERS_ADDRESS! as `0x${string}`);
+
   useEffect(() => {
     setCalldata(['', []]);
     setCalldataError('');
@@ -97,11 +100,11 @@ const Home = () => {
   ];
 
   const { config, error } = usePrepareContractWrite({
-    address,
+    address: address as `0x${string}`,
     abi,
     functionName: 'prove',
     args: [calldata[0], calldata[1]],
-    enabled: calldata[0] && calldata[1].length > 0,
+    enabled: !!calldata[0] && calldata[1].length > 0,
   });
   const {
     data: writeData,
@@ -123,15 +126,13 @@ const Home = () => {
     data,
     error: readError,
     isLoading: readLoading,
-  } = useContractRead(
-    {
-      address,
-      abi,
-      functionName: 'provenSolvers',
-      args: [wallet],
-      enabled: !!wallet,
-    },
-  );
+  } = useContractRead({
+    address: address as `0x${string}`,
+    abi,
+    functionName: 'provenSolvers',
+    args: [wallet],
+    enabled: !!wallet,
+  });
 
   useEffect(() => {
     if (readLoading) {
@@ -203,9 +204,7 @@ const Home = () => {
                   </a>
                 </div>
               )}
-              {!input1 && !input2 && (
-                <div className="text-gray-500">Please enter a value</div>
-              )}
+              {!input1 && !input2 && <div className="text-gray-500">Please enter a value</div>}
             </>
           </div>
         </div>

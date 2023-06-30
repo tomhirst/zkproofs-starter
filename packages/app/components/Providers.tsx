@@ -13,25 +13,22 @@ if (process.env.NEXT_PUBLIC_CHAIN_ID === '5') {
 } else {
   envChains.push(hardhat);
 }
-  
 
-const { chains, publicClient } = configureChains(
-  envChains,
-  [alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY! }), publicProvider()],
-);
+const { chains, publicClient } = configureChains(envChains, [
+  alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY! }),
+  publicProvider(),
+]);
 
 const { connectors } = getDefaultWallets({
   appName: 'ZKProofs Starter',
   projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID!,
   chains,
-  chainId: Number(process.env.NEXT_PUBLIC_CHAIN_ID),
 });
 
 const wagmiConfig = createConfig({
   autoConnect: true,
   connectors,
   publicClient,
-  chainId: Number(process.env.NEXT_PUBLIC_CHAIN_ID),
 });
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
