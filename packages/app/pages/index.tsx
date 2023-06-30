@@ -1,7 +1,13 @@
 import PageWrapper from '@/components/PageWrapper';
 import Button from '@/components/Button';
 import { useEffect, useState } from 'react';
-import { usePrepareContractWrite, useContractWrite, useContractRead, useAccount } from 'wagmi';
+import {
+  usePrepareContractWrite,
+  useContractWrite,
+  useContractRead,
+  useAccount,
+  useWaitForTransaction,
+} from 'wagmi';
 
 const Home = () => {
   const [input1, setInput1] = useState(0);
@@ -9,10 +15,14 @@ const Home = () => {
   const [calldataLoading, setCalldataLoading] = useState(false);
   const [calldata, setCalldata] = useState(['', []]);
   const [calldataError, setCalldataError] = useState('');
+  const [readText, setReadText] = useState('');
+  const [hash, setHash] = useState('');
   const address = process.env.NEXT_PUBLIC_HARDHAT_PROVEN_SOLVERS_ADDRESS!;
 
   useEffect(() => {
     setCalldata(['', []]);
+    setCalldataError('');
+    setHash('');
   }, [input1, input2]);
 
   const getProof = async () => {
@@ -93,19 +103,44 @@ const Home = () => {
     args: [calldata[0], calldata[1]],
     enabled: calldata[0] && calldata[1].length > 0,
   });
-  const { write, error: writeError, isLoading: writeLoading } = useContractWrite(config);
+  const {
+    data: writeData,
+    write,
+    error: writeError,
+    isLoading: writeLoading,
+  } = useContractWrite(config);
   const { address: wallet } = useAccount();
+
+  const { data: tx, isLoading: txLoading } = useWaitForTransaction({
+    hash: writeData?.hash,
+    enabled: !!writeData?.hash,
+    onSuccess(data) {
+      setHash(data.transactionHash);
+    },
+  });
 
   const {
     data,
     error: readError,
     isLoading: readLoading,
-  } = useContractRead({
-    address,
-    abi,
-    functionName: 'provenSolvers',
-    args: [wallet],
-  });
+  } = useContractRead(
+    {
+      address,
+      abi,
+      functionName: 'provenSolvers',
+      args: [wallet],
+      enabled: !!wallet,
+    },
+    [wallet],
+  );
+
+  useEffect(() => {
+    if (readLoading) {
+      setReadText('Loading...');
+    } else {
+      setReadText(data ? 'Yes' : 'No');
+    }
+  }, [readLoading, data]);
 
   return (
     <PageWrapper>
@@ -144,17 +179,37 @@ const Home = () => {
               </Button>
             </div>
             <div className="w-[180px]">
-              <Button large onClick={write} disabled={!calldata[0] && !calldata[1].length}>
-                {writeLoading ? 'Loading...' : 'Prove on-chain'}
+              <Button
+                large
+                onClick={write}
+                disabled={(!calldata[0] && !calldata[1].length) || writeLoading || txLoading}
+              >
+                {writeLoading || txLoading ? 'Loading...' : 'Prove on-chain'}
               </Button>
             </div>
           </div>
-          <div>{calldataError && <div className="text-red-500">{calldataError}</div>}</div>
+          <div>
+            <>
+              {calldataError && <div className="text-red-500">{calldataError}</div>}
+              {hash && (
+                <div className="text-green-600">
+                  Transaction successful{' '}
+                  <a
+                    className="underline"
+                    href={`https://goerli.etherscan.io/tx/${hash}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    View on Etherscan
+                  </a>
+                </div>
+              )}
+            </>
+          </div>
         </div>
         <div>
           <h3 className="text-4xl font-bold my-8">Are you a proven solver?</h3>
-
-          {!readLoading && data && data[0] ? 'Yes' : 'No'}
+          {readText}
         </div>
       </div>
     </PageWrapper>
