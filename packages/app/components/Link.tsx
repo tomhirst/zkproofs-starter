@@ -1,7 +1,7 @@
 'use client';
 
 import NextLink from 'next/link';
-import { usePathname } from 'next/navigation';
+
 import classNames from 'classnames';
 import { ReactNode, FunctionComponent } from 'react';
 import { UrlObject } from 'url';
@@ -25,7 +25,7 @@ const Link: FunctionComponent<LinkProps> = ({
   currentClassName,
   newWindow,
 }) => {
-  const pathname = usePathname();
+  const pathname = '';
   const isCurrent = pathname.includes(href.toString());
 
   let classes = classNames(className, {
